@@ -1,0 +1,191 @@
+#include <iostream>
+#include <cmath>
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+#include <unordered_map>
+
+using namespace std;
+
+int a,b,c,d,i,j,h,k,l,o,p,q,r,s,n,m;
+
+bool pierwsza(int n) {
+    if (n < 2) return false;
+    for (int i = 2; i <= sqrt(n); ++i) {
+        if (n % i == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+
+vector<pair<int, int>> rozklad_Goldbacha(int n) {
+    vector<pair<int, int>> rozklad;
+
+    for (int i = 2; i <= n / 2; ++i) {
+        if (pierwsza(i) && pierwsza(n - i)) {
+            rozklad.push_back(make_pair(i, n - i));
+        }
+    }
+
+    return rozklad;
+}
+
+
+int main()
+{
+    ifstream Liczby("liczby.txt");
+
+    cout << "Podaj zbior liczb od a do b:" << endl;
+    cout << "a = "; cin >> a; cout << "b = "; cin >> b;
+
+    i=b;
+
+    if ((a<0&&b<0)||a<0||b<0||a>b)
+        cout << "Sprobuj ponownie";
+    else
+    {
+        int tab[i];
+            for (int i=0; i<=b; i++)
+        {
+                if (i>1)
+                    tab[i]=1;
+                else
+                    tab[i]=0;
+        }
+        for (int i=2; i<sqrt(b); i++)
+           {
+                if (tab[i]==0)
+                    i=i;
+                else
+                {
+                    if (tab[i]=1)
+                    {
+                        for (j=i+i; j<=b; j+=i)
+                            tab[j]=0;
+                    }
+                    else
+                    {
+                        j=i;
+                        tab[j]=1;
+                    }
+                }
+           }
+        cout << endl << "Liczby blizniacze to:" << endl;
+
+        for (j=a; j<=b; j++)
+        {
+            if (tab[j]==1 && tab[j+2]==1)
+                cout << j << " " << j+2 << endl;
+        }
+
+        cout << endl << "Podaj liczbe parzysta w przedziale od " << a << " do " << b << endl;
+
+        cin >> n;
+
+        if (n<2)
+            {
+                cout << "Sprobuj jeszcze raz";
+                return 0;
+            }
+
+        if ((n+1)%2==0 || n>b)
+            cout << endl << "Jestes glupi";
+        else
+        {
+            cout << endl << "Rozklad liczby " << n << " na dwie liczby pierwsze to:" << endl;
+
+            for (j=a; j<=n; j++)
+            {
+                if (tab[j]==1)
+                {
+                    c=j;
+                    for (h=a; h<=n; h++)
+                        {
+                            if (tab[h]==1)
+                                d=h;
+                            if (c>=d&&c+d==n)
+                                cout << c << "+" << d << "=" << n << endl;
+                            d=0;
+                        }
+                }
+            }
+        }
+    }
+
+    cout << endl << "Liczby z pliku 'liczby.txt', ktore po pomniejszone o 1 beda liczbami pierwszymi to:" << endl;
+
+    m=0;
+    q=0;
+
+    int il[q];
+    int licz[q];
+    int li;
+    int maks=0;
+
+    if(Liczby.is_open())
+        {
+            while (Liczby >> li)
+                {
+                    bool liczbaPierwsza=true;
+                    for (k=2; k<=(li-1)/2; k++)
+                        {
+                            if ((li-1)%k==0)
+                                {
+                                    liczbaPierwsza=false;
+                                }
+                        }
+                    if (liczbaPierwsza)
+                        cout << li << endl;
+                }
+
+            Liczby.clear();
+            Liczby.seekg(0,ios::beg);
+
+
+    ifstream plik("liczby.txt");
+
+    if (!plik.is_open()) {
+        cerr << "Nie udało się otworzyć pliku liczby.txt" << endl;
+        return 1;
+    }
+
+    vector<int> liczby;
+    int liczba;
+
+    while (plik >> liczba) {
+        liczby.push_back(liczba);
+    }
+
+    plik.close();
+
+    unordered_map<int, vector<pair<int, int>>> rozklad_mapa;
+
+    for (int num : liczby) {
+        rozklad_mapa[num] = rozklad_Goldbacha(num);
+    }
+
+    auto max_it = max_element(rozklad_mapa.begin(), rozklad_mapa.end(),
+                              [](const auto& p1, const auto& p2) {
+                                  return p1.second.size() < p2.second.size();
+                              });
+
+    auto min_it = min_element(rozklad_mapa.begin(), rozklad_mapa.end(),
+                              [](const auto& p1, const auto& p2) {
+                                  return p1.second.size() < p2.second.size();
+                              });
+
+    cout << "Liczba z najwieksza iloscia rozkladow Goldbacha: " << max_it->first
+         << ", ilosc rozkladow: " << max_it->second.size() << endl;
+
+    cout << "Liczba z najmniejsza iloscia rozkladow Goldbacha: " << min_it->first
+         << ", ilosc rozkladow: " << min_it->second.size() << endl;
+
+    }
+
+    return 0;
+}
+
+
